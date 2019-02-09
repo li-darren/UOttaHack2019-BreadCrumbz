@@ -1,0 +1,14 @@
+#Branches
+git checkout -b branch-name
+
+git commit -a -m ""
+
+git push
+
+git checkout master
+git pull
+
+git checkout kat
+
+git stash
+git stash apply
