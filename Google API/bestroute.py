@@ -2,6 +2,7 @@ import requests
 import json
 import geocoder
 import math
+import urllib.parse
 
 
 class place:
@@ -76,9 +77,14 @@ def find_restaurant (start, shelter, final_dest):
     print("Lowest time: " + str(math.ceil(lowest_time/60)))
     print ("Fastest Restaurant Route: " + restaurant_list[minimum_index]["name"])
 
-    picked_place.lat = restaurant_list[minimum_index]["lat"]
-    picked_place.long = restaurant_list[minimum_index]["long"]
+    picked_place.lat = str(restaurant_list[minimum_index]["lat"])
+    picked_place.long = str(restaurant_list[minimum_index]["long"])
     return picked_place
+
+def find_route(start, restaurant, shelter, finaldest):
+    getVars = {"origin" : start.lat + "," + start.long, "destination" : finaldest.lat + "," + finaldest.long, "waypoints" : restaurant.lat + "," + restaurant.long + "|" + shelter.lat + "," + shelter.long}
+    url = 'https://www.google.com/maps/dir/?api=1&'
+    return url + urllib.parse.urlencode(getVars)
 
 
 def main():
@@ -89,6 +95,8 @@ def main():
     restaurant = find_restaurant (origin, homeless_shelter, final_destination)
     print(restaurant.lat)
     print(restaurant.long)
+    route_url = find_route (origin, restaurant, homeless_shelter, final_destination)
+    print("route url: " + route_url)
 
 if __name__ == "__main__":
     main()
