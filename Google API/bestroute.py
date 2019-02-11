@@ -82,7 +82,7 @@ def find_restaurant (start, shelter, final_dest):
     return picked_place
 
 def find_route(start, restaurant, shelter, finaldest):
-    getVars = {"key" : "#insertapikeyhere#", "origin" : start.lat + "," + start.long, "destination" : finaldest.lat + "," + finaldest.long, "waypoints" : restaurant.lat + "," + restaurant.long + "|" + shelter.lat + "," + shelter.long}
+    getVars = {"origin" : start.lat + "," + start.long, "destination" : finaldest.lat + "," + finaldest.long, "waypoints" : restaurant.lat + "," + restaurant.long + "|" + shelter.lat + "," + shelter.long}
     url = 'https://www.google.com/maps/dir/?api=1&'
     return url + urllib.parse.urlencode(getVars)
 
