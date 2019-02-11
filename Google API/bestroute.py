@@ -14,7 +14,7 @@ class place:
 def find_homeless_shelter(destination):
 
     picked_place = place()
-    parameters_home = {"key" : "AIzaSyDXNRbfoS9lQz59NF6nKFnhhsm9DFVWOOE", "location" : destination.lat + "," + destination.long, "rankby" : "distance", "keyword" : "foodbank"}
+    parameters_home = {"key" : "#insertapikeyhere#", "location" : destination.lat + "," + destination.long, "rankby" : "distance", "keyword" : "foodbank"}
 
     req_home = requests.get("https://maps.googleapis.com/maps/api/place/nearbysearch/json?", params=parameters_home)
     jsonval = req_home.json()
@@ -46,17 +46,17 @@ def find_restaurant (start, shelter, final_dest):
     minimum_index = 0
     lowest_time = 0
     for x in range(len(restaurant_list)):
-        parameters_res = {"key" : "AIzaSyDXNRbfoS9lQz59NF6nKFnhhsm9DFVWOOE", "origin" : start.lat + "," + start.long, "destination" : final_dest.lat + "," + final_dest.long, "mode" : "driving", "waypoints" : str(restaurant_list[x]["lat"]) + "," + str(restaurant_list[x]["long"]) + "|" + shelter.lat + "," + shelter.long, "avoid" : "ferries|tolls"}
+        parameters_res = {"key" : "#insertapikeyhere#", "origin" : start.lat + "," + start.long, "destination" : final_dest.lat + "," + final_dest.long, "mode" : "driving", "waypoints" : str(restaurant_list[x]["lat"]) + "," + str(restaurant_list[x]["long"]) + "|" + shelter.lat + "," + shelter.long, "avoid" : "ferries|tolls"}
         req_res = requests.get("https://maps.googleapis.com/maps/api/directions/json?", params=parameters_res)
         jsonres = req_res.json()
         print("start: " + start.name + start.lat + "," + start.long)
-        print("restaurant: " + restaurant_list[x]["name"] + str(restaurant_list[x]["lat"]) + "," + str(restaurant_list[x]["long"]))
-        print("shelter: "  + shelter.name +shelter.lat + "," + shelter.long)
-        print("final_dest: " + final_dest.name + final_dest.lat + "," + final_dest.long)
+        print("restaurant: " + restaurant_list[x]["name"] + " " + str(restaurant_list[x]["lat"]) + "," + str(restaurant_list[x]["long"]))
+        print("shelter: "  + shelter.name + " " + shelter.lat + "," + shelter.long)
+        print("final_dest: " + final_dest.name + " " + final_dest.lat + "," + final_dest.long)
         total_seconds = 0
         for y in range(len(jsonres["routes"][0]["legs"])):
             total_seconds = total_seconds + jsonres["routes"][0]["legs"][y]["duration"]["value"]
-            print("leg " + str(y) + ": " + str(total_seconds))
+            #print("leg " + str(y) + ": " + str(total_seconds))
         
         if (x == 0):
             lowest_time = total_seconds
@@ -64,7 +64,7 @@ def find_restaurant (start, shelter, final_dest):
             lowest_time = total_seconds
             minimum_index = x
 
-        print(total_seconds/60)
+        print(str(total_seconds/60) + " mins")
 
         #print("duration value: " + str(jsonres["routes"][0]["legs"][0]["duration"]["value"]))
         #print("duration text: " + jsonres["routes"][0]["legs"][0]["duration"]["text"])
@@ -74,15 +74,15 @@ def find_restaurant (start, shelter, final_dest):
         
         print("")
 
-    print("Lowest time: " + str(math.ceil(lowest_time/60)))
-    print ("Fastest Restaurant Route: " + restaurant_list[minimum_index]["name"])
+    print("Lowest time: " + str(math.ceil(lowest_time/60)) + " mins")
+    print ("Fastest Restaurant: " + restaurant_list[minimum_index]["name"])
 
     picked_place.lat = str(restaurant_list[minimum_index]["lat"])
     picked_place.long = str(restaurant_list[minimum_index]["long"])
     return picked_place
 
 def find_route(start, restaurant, shelter, finaldest):
-    getVars = {"origin" : start.lat + "," + start.long, "destination" : finaldest.lat + "," + finaldest.long, "waypoints" : restaurant.lat + "," + restaurant.long + "|" + shelter.lat + "," + shelter.long}
+    getVars = {"key" : "#insertapikeyhere#", "origin" : start.lat + "," + start.long, "destination" : finaldest.lat + "," + finaldest.long, "waypoints" : restaurant.lat + "," + restaurant.long + "|" + shelter.lat + "," + shelter.long}
     url = 'https://www.google.com/maps/dir/?api=1&'
     return url + urllib.parse.urlencode(getVars)
 
@@ -90,13 +90,16 @@ def find_route(start, restaurant, shelter, finaldest):
 def main():
     my_location = geocoder.ip('me')
     final_destination = place(45.387536, -75.709345, "Canadian Agriculture and Food Museum")
-    origin = place(str(my_location.lat), str(my_location.lng))
+    origin = place(str(my_location.lat), str(my_location.lng), "Marion Hall (MRN) ")
     homeless_shelter = find_homeless_shelter (final_destination)
     restaurant = find_restaurant (origin, homeless_shelter, final_destination)
-    print(restaurant.lat)
-    print(restaurant.long)
+    #print(restaurant.lat)
+    #print(restaurant.long)
+    #find_route returns url string
     route_url = find_route (origin, restaurant, homeless_shelter, final_destination)
     print("route url: " + route_url)
+    #post_route_url = requests.post("localhost:/PickDriverPickup", data={'url': route_url, "remove_coordinates_lat" : restaurant.lat, "remove_coordinates_long" : restaurant.long})
+    #print (post_route_url.status_code, post_route_url.reason)
 
 if __name__ == "__main__":
     main()
